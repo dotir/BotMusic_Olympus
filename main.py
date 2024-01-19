@@ -496,12 +496,11 @@ class Music(commands.Cog):
                 raise commands.CommandError('Bot is already in a voice channel.')
 
 
-bot = commands.Bot(command_prefix='!', description='Yet another music bot.', intents=intents)
-bot.add_cog(Music(bot))
-
+bot = commands.Bot(command_prefix='!', description='otra musica', intents=intents)
 
 @bot.event
 async def on_ready():
+    await bot.add_cog(Music(bot))
     print('Logged in as:\n{0.user.name}\n{0.user.id}'.format(bot))
 
 bot.run(os.getenv("TOKEN"))
