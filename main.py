@@ -76,7 +76,7 @@ async def leave(ctx):
 async def play(ctx, url):
     async with ctx.typing():
         player = await YTDLSource.from_url(url, loop=bot.loop)
-        ctx.voice_client.play(player, after=lambda e: print('Player error:', e) if e else None)
+        ctx.voice_client.play(player, after=lambda e: print('Reproducción finalizada', e))
 
     await ctx.send(f'Ahora reproduciendo: {player.title}')
 
