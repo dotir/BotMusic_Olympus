@@ -1,3 +1,5 @@
-discord.py
+discord
+async_timeout
+youtube_dl
 PyNaCl
 python-dotenv
