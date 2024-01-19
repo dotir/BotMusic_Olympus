@@ -2,7 +2,7 @@ import os
 import discord
 import asyncio
 from discord.ext import commands
-import youtube_dl
+import yt_dlp as youtube_dl
 from discord import PCMVolumeTransformer
 #variables entorno
 from dotenv import load_dotenv
