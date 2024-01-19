@@ -12,4 +12,4 @@ COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 
 # Comando para ejecutar el bot
-CMD ["python", "music_bot.py"]
+CMD ["python", "main.py"]
