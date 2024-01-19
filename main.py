@@ -1,8 +1,12 @@
+import os
 import discord
 import asyncio
 from discord.ext import commands
 import youtube_dl
 from discord import PCMVolumeTransformer
+#variables entorno
+from dotenv import load_dotenv
+load_dotenv()
 
 # Configura las opciones para youtube_dl
 youtube_dl.utils.bug_reports_message = lambda: ''
@@ -107,4 +111,4 @@ async def ensure_voice(ctx):
     elif ctx.voice_client.is_playing():
         ctx.voice_client.stop()
 
-bot.run('MTE5Nzc0MTY4MDcyMDM2NzYyNg.G0eqJ8.Q7FVcH6hwdDDMUITrftYtFRIuWiqyAYccQcYXs')
+bot.run(os.getenv("TOKEN"))
