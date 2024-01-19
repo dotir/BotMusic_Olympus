@@ -15,11 +15,10 @@ from dotenv import load_dotenv
 load_dotenv()
 # Silence useless bug reports messages
 youtube_dl.utils.bug_reports_message = lambda: ''
-
-
 intents = Intents.default()
 intents.messages = True
 intents.guilds = True
+intents.members = True
 intents.voice_states = True
 
 class VoiceError(Exception):
@@ -50,6 +49,8 @@ class YTDLSource(discord.PCMVolumeTransformer):
     FFMPEG_OPTIONS = {
         'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
         'options': '-vn',
+        # 'executable': r'D:\Archivos\BotMusica\node_modules\ffmpeg-static\ffmpeg.exe',  # Reemplaza 'ruta/a/ffmpeg' con la ruta completa a tu ejecutable de ffmpeg
+        'executable': 'ffmpeg',
     }
 
     ytdl = youtube_dl.YoutubeDL(YTDL_OPTIONS)
@@ -496,7 +497,11 @@ class Music(commands.Cog):
                 raise commands.CommandError('Bot is already in a voice channel.')
 
 
-bot = commands.Bot(command_prefix='!', description='otra musica', intents=intents)
+intents = discord.Intents.default()
+intents.members = True
+intents = discord.Intents().all()
+
+bot = commands.Bot(command_prefix=',', intents=intents)
 
 @bot.event
 async def on_ready():
