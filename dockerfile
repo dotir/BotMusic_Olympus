@@ -10,6 +10,7 @@ COPY music_bot.py music_bot.py
 
 # Instala las dependencias
 RUN pip install -r requirements.txt
+RUN pip install --force-reinstall https://github.com/yt-dlp/yt-dlp/archive/master.tar.gz
 
 # Comando para ejecutar el bot
 CMD ["python", "music_bot.py"]
