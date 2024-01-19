@@ -1,4 +1,4 @@
-discord= 1.7.3
+discord== 2.3.2
 async_timeout
 youtube_dl
 PyNaCl
