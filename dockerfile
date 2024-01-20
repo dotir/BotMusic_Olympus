@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y ffmpeg
 # Instala las dependencias de Python
 RUN pip install -r requirements.txt
 # Instala las dependencias y actualiza los paquetes
-
+# Establece la variable de entorno con el token
+ENV TOKEN=MTE5Nzc0MTY4MDcyMDM2NzYyNg.GN6p9X._VuHIVT-NqHehmvxpLkPUUEDEFSkXV_gVR-pHk
 # Comando para ejecutar el bot
 CMD ["python", "main.py"]
