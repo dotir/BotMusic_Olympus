@@ -13,7 +13,7 @@ COPY requirements.txt /app/
 # Instala ffmpeg desde el sistema de paquetes del contenedor
 RUN apt-get update && apt-get install -y ffmpeg
 
-#RUN sed -i '1794s/^/#/' /usr/local/lib/python3.12/site-packages/youtube_dl/extractor/youtube.py
+RUN sed -i '1794s/^/#/' /usr/local/lib/python3.12/site-packages/youtube_dl/extractor/youtube.py
 
 # Instala las dependencias de Python
 RUN pip install -r requirements.txt
