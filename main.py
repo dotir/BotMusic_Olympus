@@ -360,6 +360,10 @@ class Music(commands.Cog):
             ctx.voice_state.voice.pause()
             await ctx.message.add_reaction('⏯')
 
+        if ctx.voice_state.is_playing:
+            ctx.voice_state.voice.pause()
+            await ctx.message.add_reaction('⏯')
+
     @commands.command(name='resume')
     @commands.has_permissions(manage_guild=True)
     async def _resume(self, ctx: commands.Context):

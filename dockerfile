@@ -1,5 +1,5 @@
 # Usa una imagen base de Python
-FROM python:3.9
+FROM python:3.12.1-bookworm
 
 # Establece el directorio de trabajo en el contenedor
 WORKDIR /app
@@ -9,8 +9,11 @@ COPY main.py /app/
 COPY requirements.txt /app/
 
 
+#modificar el youtube
 # Instala ffmpeg desde el sistema de paquetes del contenedor
 RUN apt-get update && apt-get install -y ffmpeg
+
+#RUN sed -i '1794s/^/#/' /usr/local/lib/python3.12/site-packages/youtube_dl/extractor/youtube.py
 
 # Instala las dependencias de Python
 RUN pip install -r requirements.txt
