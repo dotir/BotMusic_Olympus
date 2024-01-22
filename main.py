@@ -238,30 +238,29 @@ class VoiceState:
     async def audio_player_task(self):
         while True:
             self.next.clear()
+            self.current = None  # Reinicia la canción actual
 
             if not self.loop:
-                # Try to get the next song within 3 minutes.
-                # If no song will be added to the queue in time,
-                # the player will disconnect due to performance
-                # reasons.
                 try:
                     async with timeout(180):  # 3 minutes
                         self.current = await self.songs.get()
                 except asyncio.TimeoutError:
                     self.bot.loop.create_task(self.stop())
                     return
-
-            self.current.source.volume = self._volume
-            self.voice.play(self.current.source, after=self.play_next_song)
-            await self.current.source.channel.send(embed=self.current.create_embed())
+                
+            if self.current:
+                self.current.source.volume = self._volume
+                self.voice.play(self.current.source, after=self.play_next_song)
+                await self.current.source.channel.send(embed=self.current.create_embed())
 
             await self.next.wait()
 
     def play_next_song(self, error=None):
         if error:
-            raise VoiceError(str(error))
+            asyncio.run_coroutine_threadsafe(self._ctx.channel.send('An error occurred: {}'.format(str(error))), self.bot.loop)
+            # Alternativamente, puedes usar logging para registrar este error.
 
-        self.next.set()
+        self.next.set()  # Asegúrate de que esto se llame siempre, independientemente de si hay un error o no.
 
     def skip(self):
         self.skip_votes.clear()
@@ -509,13 +508,23 @@ class Music(commands.Cog):
         async with ctx.typing():
             try:
                 source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop)
-            except YTDLError as e:
-                await ctx.send('An error occurred while processing this request: {}'.format(str(e)))
-            else:
                 song = Song(source)
-
                 await ctx.voice_state.songs.put(song)
                 await ctx.send('Enqueued {}'.format(str(source)))
+            except YTDLError as e:
+                await ctx.send('An error occurred while processing this request: {}'.format(str(e)))
+                await self.notify_error(ctx, e)  # Notificación de error a Discord
+
+    # Nueva función para enviar notificaciones de errores
+    async def notify_error(self, ctx, error):
+        # Aquí debes especificar el ID del canal donde quieres enviar las notificaciones de error
+        error_channel_id = 123456789  # Reemplaza esto con el ID real del canal
+        error_channel = self.bot.get_channel(error_channel_id)
+
+        if error_channel:
+            await error_channel.send(f"Error in {ctx.command}: {error}")
+        else:
+            print(f"Error sending message to error channel. Error in {ctx.command}: {error}")
 
     @_join.before_invoke
     @_play.before_invoke
