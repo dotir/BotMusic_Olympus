@@ -269,6 +269,13 @@ class VoiceState:
         if self.is_playing:
             self.voice.stop()
 
+    def skip_to(self, seconds: int):
+        if self.is_playing:
+            self.voice.stop()
+            self.current.source.start_time = seconds
+            self.voice.play(self.current.source, after=self.play_next_song)
+            asyncio.ensure_future(self.current.source.channel.send(embed=self.current.create_embed()))
+
     async def stop(self):
         self.songs.clear()
 
@@ -317,6 +324,17 @@ class Music(commands.Cog):
 
         ctx.voice_state.voice = await destination.connect()
 
+    @commands.command(name='skip_to')
+    async def _skip_to(self, ctx: commands.Context, minutes: int = 0, seconds: int = 0):
+        """Skips to a specific minute and second in the currently playing song."""
+        if not ctx.voice_state.is_playing:
+            return await ctx.send('Not playing any music right now...')
+
+        total_seconds = (minutes * 60) + seconds
+        ctx.voice_state.skip_to(total_seconds)
+        await ctx.message.add_reaction('⏭')
+
+        
     @commands.command(name='summon')
     @commands.has_permissions(manage_guild=True)
     async def _summon(self, ctx: commands.Context, *, channel: discord.VoiceChannel = None):
