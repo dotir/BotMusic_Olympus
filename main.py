@@ -45,6 +45,11 @@ class YTDLSource(discord.PCMVolumeTransformer):
         'default_search': 'auto',
         'source_address': '0.0.0.0',
     }
+    # Nuevas opciones para el video
+    VIDEO_YTDL_OPTIONS = {
+        'format': 'best',
+        'source_address': '0.0.0.0',
+    }
 
     FFMPEG_OPTIONS = {
         'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
@@ -54,6 +59,8 @@ class YTDLSource(discord.PCMVolumeTransformer):
     }
 
     ytdl = youtube_dl.YoutubeDL(YTDL_OPTIONS)
+    video_ytdl = youtube_dl.YoutubeDL(VIDEO_YTDL_OPTIONS)
+
 
     def __init__(self, ctx: commands.Context, source: discord.FFmpegPCMAudio, *, data: dict, volume: float = 0.5):
         super().__init__(source, volume)
@@ -103,6 +110,12 @@ class YTDLSource(discord.PCMVolumeTransformer):
                 raise YTDLError('Couldn\'t find anything that matches `{}`'.format(search))
 
         webpage_url = process_info['webpage_url']
+
+        if 'youtube' in webpage_url:  # Si la URL es de YouTube, utiliza la configuración de video
+            ytdl = cls.video_ytdl
+        else:
+            ytdl = cls.ytdl
+
         partial = functools.partial(cls.ytdl.extract_info, webpage_url, download=False)
         processed_info = await loop.run_in_executor(None, partial)
 
