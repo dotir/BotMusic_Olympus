@@ -509,34 +509,10 @@ class Music(commands.Cog):
             try:
                 source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop)
                 song = Song(source)
-                # Verifica si hay múltiples resultados
-                if isinstance(source, list):
-                    options = '\n'.join([f"{i + 1}. {entry['title']}" for i, entry in enumerate(source)])
-                    await ctx.send(f"Found multiple matches. Please choose a song by typing the number:\n{options}")
-
-                    def check(message):
-                        return message.author == ctx.author and message.channel == ctx.channel
-
-                    try:
-                        response = await self.bot.wait_for('message', check=check, timeout=30)
-                        choice = int(response.content)
-                        if 1 <= choice <= len(source):
-                            selected_source = await YTDLSource.create_source(ctx, source[choice - 1]['url'], loop=self.bot.loop)
-                            song = Song(selected_source)
-                            await ctx.send(f"Enqueued {song}")
-                            await ctx.message.delete()
-                        else:
-                            await ctx.send("Invalid choice. Please use a number from the list.")
-                    except asyncio.TimeoutError:
-                        await ctx.send("You took too long to make a choice. Command aborted.")
-                else:
-                    await ctx.voice_state.songs.put(song)
-                    await ctx.send('Enqueued {}'.format(str(source)))
-                    await ctx.message.delete()
-                # await ctx.voice_state.songs.put(song)
-                # await ctx.send('Enqueued {}'.format(str(source)))
-                #  # Borra el mensaje del comando !play
-                # await ctx.message.delete()
+                await ctx.voice_state.songs.put(song)
+                await ctx.send('Enqueued {}'.format(str(source)))
+                 # Borra el mensaje del comando !play
+                await ctx.message.delete()
             except YTDLError as e:
                 await ctx.send('An error occurred while processing this request: {}'.format(str(e)))
                 await self.notify_error(ctx, e)  # Notificación de error a Discord
