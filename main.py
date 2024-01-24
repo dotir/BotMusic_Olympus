@@ -562,5 +562,10 @@ bot = commands.Bot(command_prefix=',', intents=intents)
 async def on_ready():
     await bot.add_cog(Music(bot))
     print('Logged in as:\n{0.user.name}\n{0.user.id}'.format(bot))
+    
+@bot.event
+async def on_disconnect():
+    for guild_id, voice_state in bot.cogs["Music"].voice_states.items():
+        await voice_state.stop()
 
 bot.run(os.getenv("TOKEN"))
