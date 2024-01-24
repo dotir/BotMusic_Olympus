@@ -514,7 +514,12 @@ class Music(commands.Cog):
         This command automatically searches from various sites if no URL is provided.
         A list of these sites can be found here: https://rg3.github.io/youtube-dl/supportedsites.html
         """
+        if ctx.voice_state.songs.qsize() > 0:
+            await ctx.invoke(self._leave)
 
+            # Asegúrate de que el estado de voz se actualice después de salir del canal
+            await asyncio.sleep(1)
+            
         if not ctx.voice_state.voice:
             await ctx.invoke(self._join)
 
