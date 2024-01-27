@@ -22,8 +22,8 @@ RUN sed -i '1794s/^/#/' /usr/local/lib/python3.12/site-packages/youtube_dl/extra
 
 # Instala las dependencias y actualiza los paquetes
 # Establece la variable de entorno con el token
-# ENV TOKEN=MTE5Nzc0MTY4MDcyMDM2NzYyNg.GN6p9X._VuHIVT-NqHehmvxpLkPUUEDEFSkXV_gVR-pHk
-# ENV TOKEN=MTE5Nzc0MTY4MDcyMDM2NzYyNg.GN6p9X._VuHIVT-NqHehmvxpLkPUUEDEFSkXV_gVR-pHk
+ENV TOKEN=MTE5Nzc0MTY4MDcyMDM2NzYyNg.GN6p9X._VuHIVT-NqHehmvxpLkPUUEDEFSkXV_gVR-pHk
+ENV GOOGLE_API_KEY=AIzaSyDj7z4UKupYIyqh4NhyeCntYlek2n8NZoY
 
 # Comando para ejecutar el bot
 CMD ["python", "main.py"]

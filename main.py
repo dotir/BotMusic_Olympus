@@ -19,7 +19,7 @@ load_dotenv()
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")  
 geneai.configure(api_key=GOOGLE_API_KEY)
 generation_config = {
-    "temperature": 0.8,
+    "temperature": 0.5,
     "top_p": 1,
     "top_k": 1,
     "max_output_tokens": 2048,
@@ -29,6 +29,10 @@ generation_config = {
 # Inicializa el chatbot
 model = geneai.GenerativeModel('gemini-pro', generation_config=generation_config)
 chat = model.start_chat(history=[])
+
+# Agrega la función para cambiar la temperatura
+def change_temperature(new_temperature):
+    generation_config["temperature"] = new_temperature
 
 # Silence useless bug reports messages
 youtube_dl.utils.bug_reports_message = lambda: ''
@@ -71,8 +75,8 @@ class YTDLSource(discord.PCMVolumeTransformer):
     FFMPEG_OPTIONS = {
         'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
         'options': '-vn',
-        # 'executable': r'D:\Archivos\BotMusica\node_modules\ffmpeg-static\ffmpeg.exe',  # Reemplaza 'ruta/a/ffmpeg' con la ruta completa a tu ejecutable de ffmpeg
-        'executable': 'ffmpeg',
+        'executable': r'D:\Archivos\BotMusica\node_modules\ffmpeg-static\ffmpeg.exe',  # Reemplaza 'ruta/a/ffmpeg' con la ruta completa a tu ejecutable de ffmpeg
+        #'executable': 'ffmpeg',
     }
 
     ytdl = youtube_dl.YoutubeDL(YTDL_OPTIONS)
@@ -110,6 +114,10 @@ class YTDLSource(discord.PCMVolumeTransformer):
             self.channel.stop()
             self.channel.cleanup()
             self.channel = None
+
+        if self.audio_player:
+            self.audio_player.cancel()
+            self.audio_player = None
 
 
     @classmethod
@@ -386,8 +394,11 @@ class Music(commands.Cog):
 
         if not ctx.voice_state.voice:
             return await ctx.send('Not connected to any voice channel.')
-
+        
+        # Esperar a que la tarea audio_player_task finalice
         await ctx.voice_state.stop()
+        await ctx.voice_state.audio_player
+
         del self.voice_states[ctx.guild.id]
 
     @commands.command(name='volume')
@@ -552,17 +563,7 @@ class Music(commands.Cog):
                 await ctx.send('An error occurred while processing this request: {}'.format(str(e)))
                 await self.notify_error(ctx, e)  # Notificación de error a Discord
 
-    # Agrega un comando para interactuar con el chatbot
-    @commands.command(name='chat')
-    async def _chat(ctx, *, message: str):
-        response = chat.send_message(message)
-        await ctx.send(response.text)
 
-    @commands.command(name='limpiarchat')
-    async def _limpiar_historial(ctx):
-        global chat
-        chat = model.start_chat(history=[])
-        await ctx.send('Historial del chat limpiado.')
 
     # Nueva función para enviar notificaciones de errores
     async def notify_error(self, ctx, error):
@@ -591,6 +592,30 @@ intents.members = True
 intents = discord.Intents().all()
 
 bot = commands.Bot(command_prefix=',', intents=intents)
+
+# Agrega un comando para interactuar con el chatbot
+@bot.command(name='chat')
+async def _chat(ctx, *, message: str):
+    
+    response = chat.send_message(message)
+
+    # Dividir la respuesta en partes de 2000 caracteres
+    response_text = response.text
+    response_parts = [response_text[i:i+2000] for i in range(0, len(response_text), 2000)]
+
+    # Enviar cada parte de la respuesta
+    for part in response_parts:
+        await ctx.send(part)
+@bot.command(name='limpiarchat')
+async def _limpiarchat(ctx):
+    global chat
+    chat = model.start_chat(history=[])
+    await ctx.send('Historial del chat limpiado.')
+@bot.command(name='set_temperature')
+async def _set_temperature(self, ctx: commands.Context, new_temperature: float):
+    """Sets the temperature of the chatbot."""
+    change_temperature(new_temperature)
+    await ctx.send(f'Temperature set to {new_temperature}')
 
 @bot.event
 async def on_ready():
