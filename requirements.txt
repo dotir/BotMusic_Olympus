@@ -3,3 +3,4 @@ async_timeout
 youtube_dl
 PyNaCl
 python-dotenv
+google.generativeai

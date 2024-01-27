@@ -5,6 +5,8 @@ import itertools
 import math
 import random
 
+import google.generativeai as geneai
+
 import discord
 import youtube_dl
 from async_timeout import timeout
@@ -13,6 +15,20 @@ from discord import Intents
 #variables entorno
 from dotenv import load_dotenv
 load_dotenv()
+#chatbot variables
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")  
+geneai.configure(api_key=GOOGLE_API_KEY)
+generation_config = {
+    "temperature": 0.8,
+    "top_p": 1,
+    "top_k": 1,
+    "max_output_tokens": 2048,
+}
+#inicializa el chatbot
+# Inicializa el chatbot
+model = geneai.GenerativeModel('gemini-pro', generation_config=generation_config)
+chat = model.start_chat(history=[])
+
 # Silence useless bug reports messages
 youtube_dl.utils.bug_reports_message = lambda: ''
 intents = Intents.default()
@@ -534,6 +550,18 @@ class Music(commands.Cog):
             except YTDLError as e:
                 await ctx.send('An error occurred while processing this request: {}'.format(str(e)))
                 await self.notify_error(ctx, e)  # Notificación de error a Discord
+
+    # Agrega un comando para interactuar con el chatbot
+    @commands.command(name='chat')
+    async def _chat(ctx, *, message: str):
+        response = chat.send_message(message)
+        await ctx.send(response.text)
+
+    @commands.command(name='limpiar_chat')
+    async def _limpiar_historial(ctx):
+        global chat
+        chat = model.start_chat(history=[])
+        await ctx.send('Historial del chat limpiado.')
 
     # Nueva función para enviar notificaciones de errores
     async def notify_error(self, ctx, error):
