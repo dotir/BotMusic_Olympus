@@ -24,6 +24,7 @@ generation_config = {
     "top_k": 1,
     "max_output_tokens": 2048,
 }
+
 #inicializa el chatbot
 # Inicializa el chatbot
 model = geneai.GenerativeModel('gemini-pro', generation_config=generation_config)
