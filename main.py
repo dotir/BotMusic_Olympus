@@ -558,7 +558,7 @@ class Music(commands.Cog):
         response = chat.send_message(message)
         await ctx.send(response.text)
 
-    @commands.command(name='limpiar_chat')
+    @commands.command(name='limpiarchat')
     async def _limpiar_historial(ctx):
         global chat
         chat = model.start_chat(history=[])
