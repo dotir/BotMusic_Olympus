@@ -75,8 +75,8 @@ class YTDLSource(discord.PCMVolumeTransformer):
     FFMPEG_OPTIONS = {
         'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
         'options': '-vn',
-        'executable': r'D:\Archivos\BotMusica\node_modules\ffmpeg-static\ffmpeg.exe',  # Reemplaza 'ruta/a/ffmpeg' con la ruta completa a tu ejecutable de ffmpeg
-        #'executable': 'ffmpeg',
+        #'executable': r'D:\Archivos\BotMusica\node_modules\ffmpeg-static\ffmpeg.exe',  # Reemplaza 'ruta/a/ffmpeg' con la ruta completa a tu ejecutable de ffmpeg
+        'executable': 'ffmpeg',
     }
 
     ytdl = youtube_dl.YoutubeDL(YTDL_OPTIONS)
