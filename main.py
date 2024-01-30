@@ -620,8 +620,8 @@ async def _set_temperature(self, ctx: commands.Context, new_temperature: float):
 
 @bot.event
 async def on_ready():
-    bot.load_extension(Music(bot))  # Reemplaza "main" con el nombre del archivo de la cog
-    #await bot.add_cog(Music(bot))
+    #await bot.load_extension(Music(bot))  # Reemplaza "main" con el nombre del archivo de la cog
+    await bot.add_cog(Music(bot))
     print('Logged in as:\n{0.user.name}\n{0.user.id}'.format(bot))
 
 bot.run(os.getenv("TOKEN"))

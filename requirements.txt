@@ -1,6 +1,6 @@
-discord== 2.3.2
+discord
+google.generativeai
 async_timeout
 youtube_dl
 PyNaCl
 python-dotenv
-google.generativeai
