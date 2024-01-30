@@ -28,7 +28,6 @@ generation_config = {
 #inicializa el chatbot
 # Inicializa el chatbot
 model = geneai.GenerativeModel('gemini-pro', generation_config=generation_config)
-chat = model.start_chat(history=[])
 
 # Agrega la función para cambiar la temperatura
 def change_temperature(new_temperature):
@@ -41,6 +40,13 @@ intents.messages = True
 intents.guilds = True
 intents.members = True
 intents.voice_states = True
+
+class ChatBot:
+    def __init__(self):
+        self.chat = model.start_chat(history=[])
+
+    def clean_history(self):
+        self.chat = model.start_chat(history=[])
 
 class VoiceError(Exception):
     pass
@@ -551,8 +557,7 @@ class Music(commands.Cog):
                  # Borra el mensaje del comando !play
                 await ctx.message.delete()
             except YTDLError as e:
-                await ctx.send('a ocurrido un error: {}'.format(str(e)))
-                await self.notify_error(ctx, e)  # Notificación de error a Discord
+                await ctx.send('A ocurrido un error: {}'.format(str(e)))
             else:
                 song = Song(source)
 
@@ -588,12 +593,12 @@ intents.members = True
 intents = discord.Intents().all()
 
 bot = commands.Bot(command_prefix=',', intents=intents)
-
+chat_bot = ChatBot()
 # Agrega un comando para interactuar con el chatbot
 @bot.command(name='chat')
 async def _chat(ctx, *, message: str):
     
-    response = chat.send_message(message)
+    response = chat_bot.send_message(message)
 
     # Dividir la respuesta en partes de 2000 caracteres
     response_text = response.text
@@ -604,9 +609,9 @@ async def _chat(ctx, *, message: str):
         await ctx.send(part)
 @bot.command(name='limpiarchat')
 async def _limpiarchat(ctx):
-    global chat
-    chat = model.start_chat(history=[])
+    chat_bot.clean_history()
     await ctx.send('Historial del chat limpiado.')
+
 @bot.command(name='set_temperature')
 async def _set_temperature(self, ctx: commands.Context, new_temperature: float):
     """Sets the temperature of the chatbot."""
@@ -617,10 +622,5 @@ async def _set_temperature(self, ctx: commands.Context, new_temperature: float):
 async def on_ready():
     await bot.add_cog(Music(bot))
     print('Logged in as:\n{0.user.name}\n{0.user.id}'.format(bot))
-    
-@bot.event
-async def on_disconnect():
-    for guild_id, voice_state in bot.cogs["Music"].voice_states.items():
-        await voice_state.stop()
 
 bot.run(os.getenv("TOKEN"))
