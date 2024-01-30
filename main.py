@@ -266,7 +266,7 @@ class VoiceState:
     async def audio_player_task(self):
         while True:
             self.next.clear()
-            self.current = None  # Reinicia la canción actual
+            #self.current = None  # Reinicia la canción actual
 
             if not self.loop:
                 try:
@@ -275,10 +275,9 @@ class VoiceState:
                     self.bot.loop.create_task(self.stop())
                     return
                 
-            if self.current:
-                self.current.source.volume = self._volume
-                self.voice.play(self.current.source, after=self.play_next_song)
-                await self.current.source.channel.send(embed=self.current.create_embed())
+            self.current.source.volume = self._volume
+            self.voice.play(self.current.source, after=self.play_next_song)
+            await self.current.source.channel.send(embed=self.current.create_embed())
 
             await self.next.wait()
 
@@ -540,7 +539,7 @@ class Music(commands.Cog):
             await ctx.invoke(self._leave)
 
             # Asegúrate de que el estado de voz se actualice después de salir del canal
-            await asyncio.sleep(1)
+            #await asyncio.sleep(1)
             
         if not ctx.voice_state.voice:
             await ctx.invoke(self._join)
@@ -548,14 +547,16 @@ class Music(commands.Cog):
         async with ctx.typing():
             try:
                 source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop)
-                song = Song(source)
-                await ctx.voice_state.songs.put(song)
-                await ctx.send('Enqueued {}'.format(str(source)))
                  # Borra el mensaje del comando !play
                 await ctx.message.delete()
             except YTDLError as e:
-                await ctx.send('An error occurred while processing this request: {}'.format(str(e)))
+                await ctx.send('a ocurrido un error: {}'.format(str(e)))
                 await self.notify_error(ctx, e)  # Notificación de error a Discord
+            else:
+                song = Song(source)
+
+                await ctx.voice_state.songs.put(song)
+                await ctx.send('En cola {}'.format(str(source)))
 
 
 
