@@ -274,13 +274,13 @@ class VoiceState:
             self.next.clear()
             #self.current = None  # Reinicia la canción actual
 
-            if not self.loop:
-                try:
-                    #async with timeout(180):
-                    self.current = await self.songs.get()
-                except asyncio.TimeoutError:
-                    self.bot.loop.create_task(self.stop())
-                    return
+            # if not self.loop:
+            #     try:
+            #         async with timeout(180):
+            #             self.current = await self.songs.get()
+            #     except asyncio.TimeoutError:
+            #         self.bot.loop.create_task(self.stop())
+            #         return
                 
             self.current.source.volume = self._volume
             self.voice.play(self.current.source, after=self.play_next_song)
