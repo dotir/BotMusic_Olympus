@@ -272,7 +272,7 @@ class VoiceState:
                 try:
                     self.current = await self.songs.get()
                 except asyncio.TimeoutError:
-                    #self.bot.loop.create_task(self.stop())
+                    self.bot.loop.create_task(self.stop())
                     return
                 
             if self.current:
