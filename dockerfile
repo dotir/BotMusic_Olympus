@@ -22,8 +22,8 @@ RUN pip install -r requirements.txt
 
 # Instala las dependencias y actualiza los paquetes
 # Establece la variable de entorno con el token
-ENV TOKEN=MTE5Nzc0MTY4MDcyMDM2NzYyNg.GN6p9X._VuHIVT-NqHehmvxpLkPUUEDEFSkXV_gVR-pHk
-ENV GOOGLE_API_KEY=AIzaSyDj7z4UKupYIyqh4NhyeCntYlek2n8NZoY
+#ENV TOKEN=MTE5Nzc0MTY4MDcyMDM2NzYyNg.GN6p9X._VuHIVT-NqHehmvxpLkPUUEDEFSkXV_gVR-pHk
+#ENV GOOGLE_API_KEY=AIzaSyDj7z4UKupYIyqh4NhyeCntYlek2n8NZoY
 
 # Comando para ejecutar el bot
 CMD ["python", "main.py"]
