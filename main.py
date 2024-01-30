@@ -272,15 +272,12 @@ class VoiceState:
     async def audio_player_task(self):
         while True:
             self.next.clear()
-            #self.current = None  # Reinicia la canción actual
-
-            # if not self.loop:
-            #     try:
-            #         async with timeout(180):
-            #             self.current = await self.songs.get()
-            #     except asyncio.TimeoutError:
-            #         self.bot.loop.create_task(self.stop())
-            #         return
+            if not self.loop:
+                if self.songs.empty():
+                    # Espera a que se añada una nueva canción a la cola
+                    await asyncio.sleep(1)  # Puedes ajustar este tiempo según necesites
+                    continue
+                self.current = await self.songs.get()
                 
             self.current.source.volume = self._volume
             self.voice.play(self.current.source, after=self.play_next_song)
@@ -536,18 +533,6 @@ class Music(commands.Cog):
 
     @commands.command(name='play')
     async def _play(self, ctx: commands.Context, *, search: str):
-        """Plays a song.
-        If there are songs in the queue, this will be queued until the
-        other songs finished playing.
-        This command automatically searches from various sites if no URL is provided.
-        A list of these sites can be found here: https://rg3.github.io/youtube-dl/supportedsites.html
-        """
-        if ctx.voice_state.songs.qsize() > 0:
-            await ctx.invoke(self._leave)
-
-            # Asegúrate de que el estado de voz se actualice después de salir del canal
-            #await asyncio.sleep(1)
-            
         if not ctx.voice_state.voice:
             await ctx.invoke(self._join)
 
@@ -560,7 +545,6 @@ class Music(commands.Cog):
                 await ctx.send('A ocurrido un error: {}'.format(str(e)))
             else:
                 song = Song(source)
-
                 await ctx.voice_state.songs.put(song)
                 await ctx.send('En cola {}'.format(str(source)))
 
@@ -575,17 +559,17 @@ class Music(commands.Cog):
         if error_channel:
             await error_channel.send(f"Error in {ctx.command}: {error}")
         else:
-            print(f"Error sending message to error channel. Error in {ctx.command}: {error}")
+            print(f"Error al enviar el mensaje al canal de error. Error en {ctx.command}: {error}")
 
     @_join.before_invoke
     @_play.before_invoke
     async def ensure_voice_state(self, ctx: commands.Context):
         if not ctx.author.voice or not ctx.author.voice.channel:
-            raise commands.CommandError('You are not connected to any voice channel.')
+            raise commands.CommandError('No está conectado a ningún canal de voz.')
 
         if ctx.voice_client:
             if ctx.voice_client.channel != ctx.author.voice.channel:
-                raise commands.CommandError('Bot is already in a voice channel.')
+                raise commands.CommandError('El bot ya está en un canal de voz.')
 
 
 intents = discord.Intents.default()
