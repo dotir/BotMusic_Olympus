@@ -5,7 +5,7 @@ import itertools
 import math
 import random
 
-import google.generativeai as geneai
+#import google.generativeai as geneai
 
 import discord
 import youtube_dl
@@ -17,7 +17,7 @@ from dotenv import load_dotenv
 load_dotenv()
 #chatbot variables
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")  
-geneai.configure(api_key=GOOGLE_API_KEY)
+#geneai.configure(api_key=GOOGLE_API_KEY)
 generation_config = {
     "temperature": 0.5,
     "top_p": 1,
@@ -27,7 +27,7 @@ generation_config = {
 
 #inicializa el chatbot
 # Inicializa el chatbot
-model = geneai.GenerativeModel('gemini-pro', generation_config=generation_config)
+#model = geneai.GenerativeModel('gemini-pro', generation_config=generation_config)
 
 # Agrega la función para cambiar la temperatura
 def change_temperature(new_temperature):
@@ -41,12 +41,12 @@ intents.guilds = True
 intents.members = True
 intents.voice_states = True
 
-class ChatBot:
-    def __init__(self):
-        self.chat = model.start_chat(history=[])
+# class ChatBot:
+#     def __init__(self):
+#         self.chat = model.start_chat(history=[])
 
-    def clean_history(self):
-        self.chat = model.start_chat(history=[])
+#     def clean_history(self):
+#         self.chat = model.start_chat(history=[])
 
 class VoiceError(Exception):
     pass
@@ -593,30 +593,30 @@ intents.members = True
 intents = discord.Intents().all()
 
 bot = commands.Bot(command_prefix=',', intents=intents)
-chat_bot = ChatBot()
+#chat_bot = ChatBot()
 # Agrega un comando para interactuar con el chatbot
-@bot.command(name='chat')
-async def _chat(ctx, *, message: str):
+# @bot.command(name='chat')
+# async def _chat(ctx, *, message: str):
     
-    response = chat_bot.send_message(message)
+#     response = chat_bot.send_message(message)
 
-    # Dividir la respuesta en partes de 2000 caracteres
-    response_text = response.text
-    response_parts = [response_text[i:i+2000] for i in range(0, len(response_text), 2000)]
+#     # Dividir la respuesta en partes de 2000 caracteres
+#     response_text = response.text
+#     response_parts = [response_text[i:i+2000] for i in range(0, len(response_text), 2000)]
 
-    # Enviar cada parte de la respuesta
-    for part in response_parts:
-        await ctx.send(part)
-@bot.command(name='limpiarchat')
-async def _limpiarchat(ctx):
-    chat_bot.clean_history()
-    await ctx.send('Historial del chat limpiado.')
+#     # Enviar cada parte de la respuesta
+#     for part in response_parts:
+#         await ctx.send(part)
+# @bot.command(name='limpiarchat')
+# async def _limpiarchat(ctx):
+#     chat_bot.clean_history()
+#     await ctx.send('Historial del chat limpiado.')
 
-@bot.command(name='set_temperature')
-async def _set_temperature(self, ctx: commands.Context, new_temperature: float):
-    """Sets the temperature of the chatbot."""
-    change_temperature(new_temperature)
-    await ctx.send(f'Temperature set to {new_temperature}')
+# @bot.command(name='set_temperature')
+# async def _set_temperature(self, ctx: commands.Context, new_temperature: float):
+#     """Sets the temperature of the chatbot."""
+#     change_temperature(new_temperature)
+#     await ctx.send(f'Temperature set to {new_temperature}')
 
 @bot.event
 async def on_ready():
