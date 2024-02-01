@@ -1,4 +1,4 @@
-FROM python
+FROM python:3.12
 WORKDIR /app
 COPY main.py /app/
 COPY requirements.txt /app/
