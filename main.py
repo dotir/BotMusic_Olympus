@@ -81,15 +81,15 @@ class YTDLSource(discord.PCMVolumeTransformer):
     FFMPEG_OPTIONS = {
         'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
         'options': '-vn',
-        #'executable': r'D:\Archivos\BotMusica\node_modules\ffmpeg-static\ffmpeg.exe',  # Reemplaza 'ruta/a/ffmpeg' con la ruta completa a tu ejecutable de ffmpeg
-        'executable': 'ffmpeg',
+        'executable': r'D:\Archivos\BotMusica\node_modules\ffmpeg-static\ffmpeg.exe',  # Reemplaza 'ruta/a/ffmpeg' con la ruta completa a tu ejecutable de ffmpeg
+        #'executable': 'ffmpeg',
     }
 
     ytdl = youtube_dl.YoutubeDL(YTDL_OPTIONS)
     video_ytdl = youtube_dl.YoutubeDL(VIDEO_YTDL_OPTIONS)
 
 
-    def __init__(self, ctx: commands.Context, source: discord.FFmpegPCMAudio, *, data: dict, volume: float = 0.5):
+    def __init__(self, ctx: commands.Context, source: discord.FFmpegPCMAudio, *, data: dict, volume: float = 0.9):
         super().__init__(source, volume)
 
         self.requester = ctx.author
@@ -181,13 +181,13 @@ class YTDLSource(discord.PCMVolumeTransformer):
 
         duration = []
         if days > 0:
-            duration.append('{} days'.format(days))
+            duration.append('{} dias'.format(days))
         if hours > 0:
-            duration.append('{} hours'.format(hours))
+            duration.append('{} horas'.format(hours))
         if minutes > 0:
-            duration.append('{} minutes'.format(minutes))
+            duration.append('{} minutos'.format(minutes))
         if seconds > 0:
-            duration.append('{} seconds'.format(seconds))
+            duration.append('{} segundos'.format(seconds))
 
         return ', '.join(duration)
 
@@ -201,7 +201,7 @@ class Song:
 
     def create_embed(self):
         embed = (discord.Embed(title='Ahora reproduciendo',
-                               description='```css\n{0.source.title}\n```'.format(self),
+                               description='{0.source.title}'.format(self),
                                color=discord.Color.blurple()))
 
         return embed
@@ -241,7 +241,7 @@ class VoiceState:
         self.songs = SongQueue()
 
         self._loop = False
-        self._volume = 0.5
+        self._volume = 0.9
         self.skip_votes = set()
 
         self.audio_player = bot.loop.create_task(self.audio_player_task())
@@ -450,39 +450,16 @@ class Music(commands.Cog):
 
     @commands.command(name='skip')
     async def _skip(self, ctx: commands.Context):
-        """Vote to skip a song. The requester can automatically skip.
-        3 skip votes are needed for the song to be skipped.
-        """
-
         if not ctx.voice_state.is_playing:
-            return await ctx.send('Not playing any music right now...')
-
-        voter = ctx.message.author
-        if voter == ctx.voice_state.current.requester:
-            await ctx.message.add_reaction('⏭')
-            ctx.voice_state.skip()
-
-        elif voter.id not in ctx.voice_state.skip_votes:
-            ctx.voice_state.skip_votes.add(voter.id)
-            total_votes = len(ctx.voice_state.skip_votes)
-
-            if total_votes == 1:
-                await ctx.message.add_reaction('⏭')
-                ctx.voice_state.skip()
-            else:
-                await ctx.send('Skip vote added, currently at **{}/3**'.format(total_votes))
-
+            return await ctx.send('No estoy reproduciendo música en este momento...')
         else:
-            await ctx.send('You have already voted to skip this song.')
-
+            ctx.voice_state.skip()
+            await ctx.message.add_reaction('⏭')
     @commands.command(name='queue')
     async def _queue(self, ctx: commands.Context, *, page: int = 1):
-        """Shows the player's queue.
-        You can optionally specify the page to show. Each page contains 10 elements.
-        """
 
         if len(ctx.voice_state.songs) == 0:
-            return await ctx.send('Empty queue.')
+            return await ctx.send('Lista vacia.')
 
         items_per_page = 10
         pages = math.ceil(len(ctx.voice_state.songs) / items_per_page)
@@ -495,7 +472,7 @@ class Music(commands.Cog):
             queue += '`{0}.` [**{1.source.title}**]({1.source.url})\n'.format(i + 1, song)
 
         embed = (discord.Embed(description='**{} tracks:**\n\n{}'.format(len(ctx.voice_state.songs), queue))
-                 .set_footer(text='Viewing page {}/{}'.format(page, pages)))
+                 .set_footer(text='Página de visualización {}/{}'.format(page, pages)))
         await ctx.send(embed=embed)
 
     @commands.command(name='shuffle')
@@ -503,7 +480,7 @@ class Music(commands.Cog):
         """Shuffles the queue."""
 
         if len(ctx.voice_state.songs) == 0:
-            return await ctx.send('Empty queue.')
+            return await ctx.send('Lista vacia.')
 
         ctx.voice_state.songs.shuffle()
         await ctx.message.add_reaction('✅')
@@ -513,19 +490,16 @@ class Music(commands.Cog):
         """Removes a song from the queue at a given index."""
 
         if len(ctx.voice_state.songs) == 0:
-            return await ctx.send('Empty queue.')
+            return await ctx.send('Lista vacia.')
 
         ctx.voice_state.songs.remove(index - 1)
         await ctx.message.add_reaction('✅')
 
     @commands.command(name='loop')
     async def _loop(self, ctx: commands.Context):
-        """Loops the currently playing song.
-        Invoke this command again to unloop the song.
-        """
 
         if not ctx.voice_state.is_playing:
-            return await ctx.send('Nothing being played at the moment.')
+            return await ctx.send('No se esta reproduciendo nada en este momento.')
 
         # Inverse boolean value to loop and unloop.
         ctx.voice_state.loop = not ctx.voice_state.loop
@@ -547,8 +521,6 @@ class Music(commands.Cog):
                 song = Song(source)
                 await ctx.voice_state.songs.put(song)
                 await ctx.send('En cola {}'.format(str(source)))
-
-
 
     # Nueva función para enviar notificaciones de errores
     async def notify_error(self, ctx, error):
@@ -577,35 +549,34 @@ intents.members = True
 intents = discord.Intents().all()
 
 bot = commands.Bot(command_prefix=',', intents=intents)
-#chat_bot = ChatBot()
-# Agrega un comando para interactuar con el chatbot
-# @bot.command(name='chat')
-# async def _chat(ctx, *, message: str):
+
+
+chat_bot = ChatBot()
+#Agrega un comando para interactuar con el chatbot
+@bot.command(name='chat')
+async def _chat(ctx, *, message: str):
     
-#     response = chat_bot.send_message(message)
+    response = chat_bot.send_message(message)
+    # Dividir la respuesta en partes de 2000 caracteres
+    response_text = response.text
+    response_parts = [response_text[i:i+2000] for i in range(0, len(response_text), 2000)]
 
-#     # Dividir la respuesta en partes de 2000 caracteres
-#     response_text = response.text
-#     response_parts = [response_text[i:i+2000] for i in range(0, len(response_text), 2000)]
+    # Enviar cada parte de la respuesta
+    for part in response_parts:
+        await ctx.send(part)
+@bot.command(name='limpiarchat')
+async def _limpiarchat(ctx):
+    chat_bot.clean_history()
+    await ctx.send('Historial del chat limpiado.')
 
-#     # Enviar cada parte de la respuesta
-#     for part in response_parts:
-#         await ctx.send(part)
-# @bot.command(name='limpiarchat')
-# async def _limpiarchat(ctx):
-#     chat_bot.clean_history()
-#     await ctx.send('Historial del chat limpiado.')
-
-# @bot.command(name='set_temperature')
-# async def _set_temperature(self, ctx: commands.Context, new_temperature: float):
-#     """Sets the temperature of the chatbot."""
-#     change_temperature(new_temperature)
-#     await ctx.send(f'Temperature set to {new_temperature}')
+@bot.command(name='set_temperature')
+async def _set_temperature(self, ctx: commands.Context, new_temperature: float):
+    """Sets the temperature of the chatbot."""
+    change_temperature(new_temperature)
+    await ctx.send(f'Temperature set to {new_temperature}')
 
 @bot.event
 async def on_ready():
-    #await bot.load_extension(Music(bot))  # Reemplaza "main" con el nombre del archivo de la cog
     await bot.add_cog(Music(bot))
-    print('Logged in as:\n{0.user.name}\n{0.user.id}'.format(bot))
 
 bot.run(os.getenv("TOKEN"))
