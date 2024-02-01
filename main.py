@@ -5,7 +5,7 @@ import itertools
 import math
 import random
 
-#import google.generativeai as geneai
+import google.generativeai as geneai
 
 import discord
 import youtube_dl
@@ -17,7 +17,7 @@ from dotenv import load_dotenv
 load_dotenv()
 #chatbot variables
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")  
-#geneai.configure(api_key=GOOGLE_API_KEY)
+geneai.configure(api_key=GOOGLE_API_KEY)
 generation_config = {
     "temperature": 0.5,
     "top_p": 1,
@@ -27,7 +27,7 @@ generation_config = {
 
 #inicializa el chatbot
 # Inicializa el chatbot
-#model = geneai.GenerativeModel('gemini-pro', generation_config=generation_config)
+model = geneai.GenerativeModel('gemini-pro', generation_config=generation_config)
 
 # Agrega la función para cambiar la temperatura
 def change_temperature(new_temperature):
@@ -41,12 +41,12 @@ intents.guilds = True
 intents.members = True
 intents.voice_states = True
 
-# class ChatBot:
-#     def __init__(self):
-#         self.chat = model.start_chat(history=[])
+class ChatBot:
+    def __init__(self):
+        self.chat = model.start_chat(history=[])
 
-#     def clean_history(self):
-#         self.chat = model.start_chat(history=[])
+    def clean_history(self):
+        self.chat = model.start_chat(history=[])
 
 class VoiceError(Exception):
     pass
