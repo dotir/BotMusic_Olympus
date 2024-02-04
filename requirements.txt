@@ -1,5 +1,5 @@
 discord
-google.generativeai
+google-generativeai
 async_timeout
 youtube_dl
 PyNaCl
