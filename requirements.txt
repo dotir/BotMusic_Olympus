@@ -1,6 +1,7 @@
 discord
-google-generativeai
+python-dotenv
+#google-generativeai
 async_timeout
 youtube_dl
 PyNaCl
-python-dotenv
+
