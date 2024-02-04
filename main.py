@@ -60,7 +60,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
         'format': 'bestaudio/best',
         'extractaudio': True,
         'audioformat': 'mp3',
-        'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
+        'outtmpl': '%(extractor)s-%(title)s.%(ext)s',
         'restrictfilenames': True,
         'noplaylist': True,
         'nocheckcertificate': True,
@@ -110,8 +110,8 @@ class YTDLSource(discord.PCMVolumeTransformer):
         self.dislikes = data.get('dislike_count')
         self.stream_url = data.get('url')
 
-    def __str__(self):
-        return '**{0.title}** by **{0.uploader}**'.format(self)
+    # def __str__(self):
+    #     return '**{0.title}** by **{0.uploader}**'.format(self)
 
     def stop(self):
         """Detiene la reproducción actual y cierra los recursos asociados."""
