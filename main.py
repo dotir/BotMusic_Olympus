@@ -16,7 +16,8 @@ from discord import Intents
 from dotenv import load_dotenv
 load_dotenv()
 #chatbot variables
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")  
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+TOKEN_BOT=os.getenv('TOKEN_BOT')  
 geneai.configure(api_key=GOOGLE_API_KEY)
 generation_config = {
     "temperature": 0.5,
@@ -579,4 +580,4 @@ async def _set_temperature(self, ctx: commands.Context, new_temperature: float):
 async def on_ready():
     await bot.add_cog(Music(bot))
 
-bot.run(os.getenv("TOKEN"))
+bot.run(token=TOKEN_BOT)
