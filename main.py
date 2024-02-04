@@ -4,9 +4,7 @@ import functools
 import itertools
 import math
 import random
-
 import google.generativeai as geneai
-
 import discord
 import youtube_dl
 from async_timeout import timeout
