@@ -80,7 +80,6 @@ class YTDLSource(discord.PCMVolumeTransformer):
     FFMPEG_OPTIONS = {
         'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
         'options': '-vn',
-        #'executable': r'D:\Archivos\BotMusica\node_modules\ffmpeg-static\ffmpeg.exe',  # Reemplaza 'ruta/a/ffmpeg' con la ruta completa a tu ejecutable de ffmpeg
         'executable': 'ffmpeg',
     }
 
@@ -110,8 +109,8 @@ class YTDLSource(discord.PCMVolumeTransformer):
         self.dislikes = data.get('dislike_count')
         self.stream_url = data.get('url')
 
-    # def __str__(self):
-    #     return '**{0.title}** by **{0.uploader}**'.format(self)
+    def __str__(self):
+        return '**{0.title}**'.format(self)
 
     def stop(self):
         """Detiene la reproducción actual y cierra los recursos asociados."""
@@ -334,7 +333,7 @@ class Music(commands.Cog):
 
     def cog_check(self, ctx: commands.Context):
         if not ctx.guild:
-            raise commands.NoPrivateMessage('This command can\'t be used in DM channels.')
+            raise commands.NoPrivateMessage('Este comando no se puede utilizar en canales DM.')
 
         return True
 
@@ -342,7 +341,7 @@ class Music(commands.Cog):
         ctx.voice_state = self.get_voice_state(ctx)
 
     async def cog_command_error(self, ctx: commands.Context, error: commands.CommandError):
-        await ctx.send('An error occurred: {}'.format(str(error)))
+        await ctx.send('Ocurrió un error: {}'.format(str(error)))
 
     @commands.command(name='join', invoke_without_subcommand=True)
     async def _join(self, ctx: commands.Context):
@@ -359,7 +358,7 @@ class Music(commands.Cog):
     async def _skip_to(self, ctx: commands.Context, minutes: int = 0, seconds: int = 0):
         """Skips to a specific minute and second in the currently playing song."""
         if not ctx.voice_state.is_playing:
-            return await ctx.send('Not playing any music right now...')
+            return await ctx.send('No estoy reproduciendo música en este momento...')
 
         total_seconds = (minutes * 60) + seconds
         ctx.voice_state.skip_to(total_seconds)
@@ -374,7 +373,7 @@ class Music(commands.Cog):
         """
 
         if not channel and not ctx.author.voice:
-            raise VoiceError('You are neither connected to a voice channel nor specified a channel to join.')
+            raise VoiceError('No está conectado a un canal de voz ni ha especificado un canal al que unirse.')
 
         destination = channel or ctx.author.voice.channel
         if ctx.voice_state.voice:
@@ -389,7 +388,7 @@ class Music(commands.Cog):
         """Clears the queue and leaves the voice channel."""
 
         if not ctx.voice_state.voice:
-            return await ctx.send('Not connected to any voice channel.')
+            return await ctx.send('No conectado a ningún canal de voz.')
         
         # Esperar a que la tarea audio_player_task finalice
         await ctx.voice_state.stop()
@@ -402,13 +401,13 @@ class Music(commands.Cog):
         """Sets the volume of the player."""
 
         if not ctx.voice_state.is_playing:
-            return await ctx.send('Nothing being played at the moment.')
+            return await ctx.send('No se reproduce nada por el momento.')
 
         if 0 > volume > 100:
-            return await ctx.send('Volume must be between 0 and 100')
+            return await ctx.send('El volumen debe estar entre 0 y 100.')
 
         ctx.voice_state.volume = volume / 100
-        await ctx.send('Volume of the player set to {}%'.format(volume))
+        await ctx.send('Volumen del reproductor configurado en {}%'.format(volume))
 
     @commands.command(name='now', aliases=['current', 'playing'])
     async def _now(self, ctx: commands.Context):
