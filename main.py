@@ -1,3 +1,4 @@
+# Importaciones
 import os
 import asyncio
 import functools
@@ -10,10 +11,10 @@ import youtube_dl
 from async_timeout import timeout
 from discord.ext import commands
 from discord import Intents
-#variables entorno
 from dotenv import load_dotenv
+
+# Configuración y Variables de Entorno
 load_dotenv()
-#chatbot variables
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 TOKEN_BOT=os.getenv('TOKEN_BOT')  
 geneai.configure(api_key=GOOGLE_API_KEY)
@@ -25,7 +26,6 @@ generation_config = {
 }
 
 model = geneai.GenerativeModel('gemini-pro', generation_config=generation_config)
-
 # Agrega la función para cambiar la temperatura
 def change_temperature(new_temperature):
     generation_config["temperature"] = new_temperature
@@ -39,6 +39,7 @@ intents.members = True
 intents.voice_states = True
 intents = Intents().all()
 
+# Clase ChatBot
 class ChatBot:
     def __init__(self):
         self.chat = model.start_chat(history=[])
@@ -48,12 +49,10 @@ class ChatBot:
 
 class VoiceError(Exception):
     pass
-
-
 class YTDLError(Exception):
     pass
 
-
+# Clase YTDLSource
 class YTDLSource(discord.PCMVolumeTransformer):
     YTDL_OPTIONS = {
         'format': 'bestaudio/best',
@@ -226,7 +225,7 @@ class SongQueue(asyncio.Queue):
     def remove(self, index: int):
         del self._queue[index]
 
-
+# Clase VoiceState
 class VoiceState:
     def __init__(self, bot: commands.Bot, ctx: commands.Context):
         self.bot = bot
@@ -312,7 +311,7 @@ class VoiceState:
             await self.voice.disconnect()
             self.voice = None
 
-
+# Clase Music
 class Music(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -541,11 +540,11 @@ class Music(commands.Cog):
             if ctx.voice_client.channel != ctx.author.voice.channel:
                 raise commands.CommandError('El bot ya está en un canal de voz.')
 
+# Inicialización del Bot
 bot = commands.Bot(command_prefix=',', intents=intents)
-
-
 chat_bot = ChatBot()
-#Agrega un comando para interactuar con el chatbot
+
+# Comandos del Bot
 @bot.command(name='chat')
 async def _chat(ctx, *, message: str):
     """Ingresa tu pregunta al chat de gemini-pro."""
@@ -568,7 +567,8 @@ async def _set_temperature(self, ctx: commands.Context, new_temperature: float):
     """Sets the temperature of the chatbot."""
     change_temperature(new_temperature)
     await ctx.send(f'Temperature set to {new_temperature}')
-
+    
+# Manejador de Eventos
 @bot.event
 async def on_ready():
     await bot.add_cog(Music(bot))
