@@ -121,7 +121,6 @@ class YTDLSource(discord.PCMVolumeTransformer):
             self.audio_player.cancel()
             self.audio_player = None
 
-
     @classmethod
     async def create_source(cls, ctx: commands.Context, search: str, *, loop: asyncio.BaseEventLoop = None):
         loop = loop or asyncio.get_event_loop()
