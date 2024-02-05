@@ -11,12 +11,11 @@ RUN apt-get update && apt-get install -y ffmpeg
 
 # Crea y activa el entorno virtual
 RUN python -m venv venv
+# Usa el shell 'bash' para ejecutar los comandos de activación
 SHELL ["/bin/bash", "-c"]
-RUN source venv/bin/activate
-
-# Instala las dependencias de Python dentro del entorno virtual
-RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
+RUN source venv/bin/activate && \
+    pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
 # Modifica el archivo necesario
 RUN sed -i '1794s/^/#/' /usr/local/lib/python3.12/site-packages/youtube_dl/extractor/youtube.py
