@@ -37,6 +37,7 @@ intents.messages = True
 intents.guilds = True
 intents.members = True
 intents.voice_states = True
+intents = Intents().all()
 
 class ChatBot:
     def __init__(self):
@@ -539,11 +540,6 @@ class Music(commands.Cog):
         if ctx.voice_client:
             if ctx.voice_client.channel != ctx.author.voice.channel:
                 raise commands.CommandError('El bot ya está en un canal de voz.')
-
-
-intents = discord.Intents.default()
-intents.members = True
-intents = discord.Intents().all()
 
 bot = commands.Bot(command_prefix=',', intents=intents)
 
