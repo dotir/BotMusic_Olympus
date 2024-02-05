@@ -4,7 +4,7 @@ import functools
 import itertools
 import math
 import random
-#import google.generativeai as geneai
+import google.generativeai as geneai
 import discord
 import youtube_dl
 from async_timeout import timeout
@@ -16,7 +16,7 @@ load_dotenv()
 #chatbot variables
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 TOKEN_BOT=os.getenv('TOKEN_BOT')  
-#geneai.configure(api_key=GOOGLE_API_KEY)
+geneai.configure(api_key=GOOGLE_API_KEY)
 generation_config = {
     "temperature": 0.5,
     "top_p": 1,
@@ -24,13 +24,11 @@ generation_config = {
     "max_output_tokens": 2048,
 }
 
-#inicializa el chatbot
-# Inicializa el chatbot
-#model = geneai.GenerativeModel('gemini-pro', generation_config=generation_config)
+model = geneai.GenerativeModel('gemini-pro', generation_config=generation_config)
 
 # Agrega la función para cambiar la temperatura
-# def change_temperature(new_temperature):
-#     generation_config["temperature"] = new_temperature
+def change_temperature(new_temperature):
+    generation_config["temperature"] = new_temperature
 
 # Silence useless bug reports messages
 youtube_dl.utils.bug_reports_message = lambda: ''
@@ -40,12 +38,12 @@ intents.guilds = True
 intents.members = True
 intents.voice_states = True
 
-# class ChatBot:
-#     def __init__(self):
-#         self.chat = model.start_chat(history=[])
+class ChatBot:
+    def __init__(self):
+        self.chat = model.start_chat(history=[])
 
-#     def clean_history(self):
-#         self.chat = model.start_chat(history=[])
+    def clean_history(self):
+        self.chat = model.start_chat(history=[])
 
 class VoiceError(Exception):
     pass
@@ -132,7 +130,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
         data = await loop.run_in_executor(None, partial)
 
         if data is None:
-            raise YTDLError('Couldn\'t find anything that matches `{}`'.format(search))
+            raise YTDLError('No se pudo encontrar nada que coincida `{}`'.format(search))
 
         if 'entries' not in data:
             process_info = data
@@ -144,7 +142,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
                     break
 
             if process_info is None:
-                raise YTDLError('Couldn\'t find anything that matches `{}`'.format(search))
+                raise YTDLError('No se pudo encontrar nada que coincida `{}`'.format(search))
 
         webpage_url = process_info['webpage_url']
 
@@ -157,7 +155,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
         processed_info = await loop.run_in_executor(None, partial)
 
         if processed_info is None:
-            raise YTDLError('Couldn\'t fetch `{}`'.format(webpage_url))
+            raise YTDLError('No se pudo recuperar `{}`'.format(webpage_url))
 
         if 'entries' not in processed_info:
             info = processed_info
@@ -167,7 +165,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
                 try:
                     info = processed_info['entries'].pop(0)
                 except IndexError:
-                    raise YTDLError('Couldn\'t retrieve any matches for `{}`'.format(webpage_url))
+                    raise YTDLError('No se pudo recuperar ninguna coincidencia para `{}`'.format(webpage_url))
 
         return cls(ctx, discord.FFmpegPCMAudio(info['url'], **cls.FFMPEG_OPTIONS), data=info)
 
@@ -285,7 +283,7 @@ class VoiceState:
 
     def play_next_song(self, error=None):
         if error:
-            asyncio.run_coroutine_threadsafe(self._ctx.channel.send('An error occurred: {}'.format(str(error))), self.bot.loop)
+            asyncio.run_coroutine_threadsafe(self._ctx.channel.send('Ocurrió un error: {}'.format(str(error))), self.bot.loop)
             # Alternativamente, puedes usar logging para registrar este error.
 
         self.next.set()  # Asegúrate de que esto se llame siempre, independientemente de si hay un error o no.
@@ -345,7 +343,7 @@ class Music(commands.Cog):
 
     @commands.command(name='join', invoke_without_subcommand=True)
     async def _join(self, ctx: commands.Context):
-        """Joins a voice channel."""
+        """Se une a un canal de voz."""
 
         destination = ctx.author.voice.channel
         if ctx.voice_state.voice:
@@ -356,7 +354,7 @@ class Music(commands.Cog):
 
     @commands.command(name='skip_to')
     async def _skip_to(self, ctx: commands.Context, minutes: int = 0, seconds: int = 0):
-        """Skips to a specific minute and second in the currently playing song."""
+        """Salta a un minuto y segundo específicos de la canción que se está reproduciendo actualmente."""
         if not ctx.voice_state.is_playing:
             return await ctx.send('No estoy reproduciendo música en este momento...')
 
@@ -385,7 +383,7 @@ class Music(commands.Cog):
     @commands.command(name='leave', aliases=['disconnect'])
     @commands.has_permissions(manage_guild=True)
     async def _leave(self, ctx: commands.Context):
-        """Clears the queue and leaves the voice channel."""
+        """Borra la cola y abandona el canal de voz."""
 
         if not ctx.voice_state.voice:
             return await ctx.send('No conectado a ningún canal de voz.')
@@ -411,14 +409,14 @@ class Music(commands.Cog):
 
     @commands.command(name='now', aliases=['current', 'playing'])
     async def _now(self, ctx: commands.Context):
-        """Displays the currently playing song."""
+        """Muestra la canción que se reproduce actualmente."""
 
         await ctx.send(embed=ctx.voice_state.current.create_embed())
 
     @commands.command(name='pause')
     @commands.has_permissions(manage_guild=True)
     async def _pause(self, ctx: commands.Context):
-        """Pauses the currently playing song."""
+        """Pausa la canción que se está reproduciendo actualmente."""
 
         if  ctx.voice_state.is_playing and ctx.voice_state.voice.is_playing():
             ctx.voice_state.voice.pause()
@@ -427,7 +425,7 @@ class Music(commands.Cog):
     @commands.command(name='resume')
     @commands.has_permissions(manage_guild=True)
     async def _resume(self, ctx: commands.Context):
-        """Resumes a currently paused song."""
+        """Reanuda una canción actualmente en pausa."""
 
         if  ctx.voice_state.is_playing and ctx.voice_state.voice.is_paused():
             ctx.voice_state.voice.resume()
@@ -436,7 +434,7 @@ class Music(commands.Cog):
     @commands.command(name='stop')
     @commands.has_permissions(manage_guild=True)
     async def _stop(self, ctx: commands.Context):
-        """Stops playing song and clears the queue."""
+        """Deja de reproducir la canción y borra la cola."""
 
         ctx.voice_state.songs.clear()
         await ctx.voice_state.stop()
@@ -475,7 +473,7 @@ class Music(commands.Cog):
 
     @commands.command(name='shuffle')
     async def _shuffle(self, ctx: commands.Context):
-        """Shuffles the queue."""
+        """Mezcla la cola."""
 
         if len(ctx.voice_state.songs) == 0:
             return await ctx.send('Lista vacia.')
@@ -485,7 +483,7 @@ class Music(commands.Cog):
 
     @commands.command(name='remove')
     async def _remove(self, ctx: commands.Context, index: int):
-        """Removes a song from the queue at a given index."""
+        """Elimina una canción de la cola en un índice determinado."""
 
         if len(ctx.voice_state.songs) == 0:
             return await ctx.send('Lista vacia.')
@@ -495,6 +493,7 @@ class Music(commands.Cog):
 
     @commands.command(name='loop')
     async def _loop(self, ctx: commands.Context):
+        """Repita la canción que se está reproduciendo actualmente."""
 
         if not ctx.voice_state.is_playing:
             return await ctx.send('No se esta reproduciendo nada en este momento.')
@@ -549,29 +548,30 @@ intents = discord.Intents().all()
 bot = commands.Bot(command_prefix=',', intents=intents)
 
 
-#chat_bot = ChatBot()
+chat_bot = ChatBot()
 #Agrega un comando para interactuar con el chatbot
-# @bot.command(name='chat')
-# async def _chat(ctx, *, message: str):
-    
-#     response = chat_bot.send_message(message)
-#     # Dividir la respuesta en partes de 2000 caracteres
-#     response_text = response.text
-#     response_parts = [response_text[i:i+2000] for i in range(0, len(response_text), 2000)]
+@bot.command(name='chat')
+async def _chat(ctx, *, message: str):
+    """Ingresa tu pregunta al chat de gemini-pro."""
+    response = chat_bot.send_message(message)
+    # Dividir la respuesta en partes de 2000 caracteres
+    response_text = response.text
+    response_parts = [response_text[i:i+2000] for i in range(0, len(response_text), 2000)]
 
-#     # Enviar cada parte de la respuesta
-#     for part in response_parts:
-#         await ctx.send(part)
-# @bot.command(name='limpiarchat')
-# async def _limpiarchat(ctx):
-#     chat_bot.clean_history()
-#     await ctx.send('Historial del chat limpiado.')
+    # Enviar cada parte de la respuesta
+    for part in response_parts:
+        await ctx.send(part)
+@bot.command(name='limpiarchat')
+async def _limpiarchat(ctx):
+    """Limpiar el historial del chat."""
+    chat_bot.clean_history()
+    await ctx.send('Historial del chat limpiado.')
 
-# @bot.command(name='set_temperature')
-# async def _set_temperature(self, ctx: commands.Context, new_temperature: float):
-#     """Sets the temperature of the chatbot."""
-#     change_temperature(new_temperature)
-#     await ctx.send(f'Temperature set to {new_temperature}')
+@bot.command(name='set_temperature')
+async def _set_temperature(self, ctx: commands.Context, new_temperature: float):
+    """Sets the temperature of the chatbot."""
+    change_temperature(new_temperature)
+    await ctx.send(f'Temperature set to {new_temperature}')
 
 @bot.event
 async def on_ready():
