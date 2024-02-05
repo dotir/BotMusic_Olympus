@@ -1,13 +1,13 @@
 FROM python:3.12
 
+# Instala las dependencias del sistema
+RUN apt-get update && apt-get install -y ffmpeg
+
 WORKDIR /app
 
 # Copia los archivos necesarios al contenedor
 COPY main.py /app/
 COPY requirements.txt /app/
-
-# Instala las dependencias del sistema
-RUN apt-get update && apt-get install -y ffmpeg
 
 # Usa el shell 'bash' para ejecutar los comandos de activación
 RUN pip install --upgrade pip && \
