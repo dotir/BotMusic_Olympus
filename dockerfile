@@ -19,7 +19,7 @@ RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Desactiva el entorno virtual para que no quede activado en la imagen final
-RUN deactivate
+#RUN deactivate
 
 # Modifica el archivo necesario
 RUN sed -i '1794s/^/#/' /usr/local/lib/python3.12/site-packages/youtube_dl/extractor/youtube.py
