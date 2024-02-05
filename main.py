@@ -519,17 +519,6 @@ class Music(commands.Cog):
                 await ctx.voice_state.songs.put(song)
                 await ctx.send('En cola {}'.format(str(source)))
 
-    # Nueva función para enviar notificaciones de errores
-    async def notify_error(self, ctx, error):
-        # Aquí debes especificar el ID del canal donde quieres enviar las notificaciones de error
-        error_channel_id = 123456789  # Reemplaza esto con el ID real del canal
-        error_channel = self.bot.get_channel(error_channel_id)
-
-        if error_channel:
-            await error_channel.send(f"Error in {ctx.command}: {error}")
-        else:
-            print(f"Error al enviar el mensaje al canal de error. Error en {ctx.command}: {error}")
-
     @_join.before_invoke
     @_play.before_invoke
     async def ensure_voice_state(self, ctx: commands.Context):
