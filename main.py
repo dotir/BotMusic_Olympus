@@ -536,7 +536,7 @@ chat_bot = ChatBot()
 @bot.command(name='chat')
 async def _chat(ctx, *, message: str):
     """Ingresa tu pregunta al chat de gemini-pro."""
-    response = chat_bot.send_message(message)
+    response = chat_bot.chat.send_message(message)
     # Dividir la respuesta en partes de 2000 caracteres
     response_text = response.text
     response_parts = [response_text[i:i+2000] for i in range(0, len(response_text), 2000)]
