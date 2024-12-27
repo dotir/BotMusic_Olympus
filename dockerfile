@@ -17,8 +17,9 @@ RUN pip install --upgrade pip && \
 RUN sed -i '1794s/^/#/' /usr/local/lib/python3.12/site-packages/youtube_dl/extractor/youtube.py
 
 # Configura las variables de entorno
-ENV TOKEN_BOT=MTE5Nzc0MTY4MDcyMDM2NzYyNg.G4YCys.pqKscxt9el0fwNYvLlXLhxkGgJoDLAvODzrob8
-ENV GOOGLE_API_KEY=AIzaSyDj7z4UKupYIyqh4NhyeCntYlek2n8NZoY
+#descomentar y colocar tu token
+#ENV TOKEN_BOT=tutoken
+#ENV GOOGLE_API_KEY=tokendegoogle
 
 # Establece el comando de inicio
 CMD ["python", "main.py"]
